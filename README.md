@@ -1,2 +1,2 @@
 # network-security
-Okul projesi için yapılacak.
+https://app.diagrams.net/?src=about#HAseloth99%2Fnetwork-security%2Fmain%2FdatabaseMA
