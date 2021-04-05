@@ -4,7 +4,7 @@
 
 import FBConf as fb
 
-print(fb.db.child("Açık").get().val())
+print(fb.db.child("test").get().val())
 
 
 
