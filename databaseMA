@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-04-09T17:10:24.763Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36" etag="fD4uKtTE9NIfy3u7zn_b" version="14.5.7" type="github">
+<mxfile host="app.diagrams.net" modified="2021-04-09T17:10:51.637Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36" etag="N1PGDZLemWqGo7tADmfm" version="14.5.7" type="github">
   <diagram id="uIcJlM-LuDp_AlD6BcIR" name="Page-1">
     <mxGraphModel dx="1695" dy="1603" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -117,11 +117,8 @@
         <mxCell id="jH3iyigyzvNMceKBrVGi-71" value="AES id" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fillColor=none;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
           <mxGeometry x="-680" y="-230" width="180" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="jH3iyigyzvNMceKBrVGi-72" value="* AES Key" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="jH3iyigyzvNMceKBrVGi-71" vertex="1">
-          <mxGeometry y="26" width="180" height="26" as="geometry" />
-        </mxCell>
         <mxCell id="jH3iyigyzvNMceKBrVGi-73" value="Target User Mail" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="jH3iyigyzvNMceKBrVGi-71" vertex="1">
-          <mxGeometry y="52" width="180" height="26" as="geometry" />
+          <mxGeometry y="26" width="180" height="26" as="geometry" />
         </mxCell>
         <mxCell id="jH3iyigyzvNMceKBrVGi-79" value="1 to N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="jH3iyigyzvNMceKBrVGi-45" target="jH3iyigyzvNMceKBrVGi-71" edge="1">
           <mxGeometry relative="1" as="geometry">
