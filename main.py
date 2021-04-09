@@ -5,6 +5,3 @@
 import FBConf as fb
 
 print(fb.db.child("test").get().val())
-
-
-
