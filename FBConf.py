@@ -1,7 +1,7 @@
 import pyrebase
 
 pyrebaseConfig = {
-    "apiKey": "AIzaSyBoFLL9n122ZcSrbvjtpuHQpJ4OFTwthss",
+    "apiKey": "AIzaSyBRJf30qwB-ExBLryAYxLsNLllbEnF7IZM",
     "authDomain": "network-security-mail.firebaseapp.com",
     "projectId": "network-security-mail",
     "databaseURL": "https://network-security-mail-default-rtdb.firebaseio.com",

@@ -2,6 +2,9 @@ from PyQt5.QtWidgets import QMessageBox
 from validate_email import validate_email
 from PyQt5 import QtCore, QtGui, QtWidgets
 import FBConf
+import RSAGenerator
+import RSACipher
+import Signature
 
 class Ui_Register(object):
     def setupUi(self, Register):
@@ -61,9 +64,7 @@ class Ui_Register(object):
         self.edtTxtGmail.setPlaceholderText(_translate("Register", "Enter Gmail"))
         self.edtTxtUsername.setText("asdf")
         self.edtTxtPassword.setText("123456")
-        self.edtTxtGmail.setText("ggg@gggg.co")
-
-
+        self.edtTxtGmail.setText("ggg28@gggg.co")
 
     def goReg(self):
         self.Registering(self.edtTxtUsername.text(), self.edtTxtPassword.text(), self.edtTxtGmail.text())
@@ -101,18 +102,35 @@ class Ui_Register(object):
 
                     else:
                         user= FBConf.auth.create_user_with_email_and_password(gmail,password)
+                        #Kullanıcı Oluşturuldu username ve gmail adresleri kaydedildi
+                        FBConf.db.child("User").child(user['localId']).child('Username').set(username,token=user['idToken'])
+                        FBConf.db.child("User").child(user['localId']).child('Gmail').set(gmail,token=user['idToken'])
+                        ###
 
-                        FBConf.db.child("User").child(user['localId']).child('Username').push(username,token=user['idToken'])
+                        #Kullanıcı için RSA keyler oluşturuldu ve database kaydedidli
+                        rsaGenerator=RSAGenerator.RSAGenerator()
 
-                        FBConf.db.child("User").child(user['localId']).child('Gmail').push(gmail,token=user['idToken'])
-
-                        FBConf.db.
-
-
-
-                        db.child("User").child("Mustafa").child("Username").push("Mustafa")
-                        db.child("User").child("Mustafa").child("Gmail").push("mustafaacik92@gmail.com")
+                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateKey').set(str(rsaGenerator.privateKey),token=user['idToken']) #Bu Localde Tutulacak
+                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PublicKey').set(str(rsaGenerator.publicKey[0]),token=user['idToken'])
+                        FBConf.db.child("User").child(user['localId']).child("RSA").child('n').set(str(rsaGenerator.publicKey[1]),token=user['idToken'])
+                        ###
                         
+                        #Kullanıcı RSA public keyi RootRSA private key tarafından imzalandı
+                        
+                        RootRSAPrivate=FBConf.db.child("RootRSA").child("private").get().val() 
+                        RootRSAN=FBConf.db.child("RootRSA").child("n").get().val() 
+                        RootRSAPublic=FBConf.db.child("RootRSA").child("public").get().val() 
+                        
+                        signatureObj = Signature.Signature(RootRSAN,RootRSAPublic,RootRSAPrivate)
+                        signature=signatureObj.Signaturing(rsaGenerator.publicKey[1]) #n'yi alıyor   Public key (e,n) ,e hepsinde aynı çünkü
+                        
+                        # if signatureObj.Verify(signature,rsaGenerator.publicKey[1]):
+                        #     print("İmza Doğru")
+                        # else:
+                        #     print("İmza Yanlış")
+
+                        FBConf.db.child("User").child(user['localId']).child('RSASignature').set(str(signature),token=user['idToken'])
+
                         return True
                     
         else:

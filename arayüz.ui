@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Home</class>
+ <widget class="QMainWindow" name="Home">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>693</width>
+    <height>622</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>561</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Send Mail</string>
+     </attribute>
+     <widget class="QLineEdit" name="toLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>To</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="fromLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>161</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>From: </string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="subjectLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>Subject</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="messageTextEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>531</width>
+        <height>381</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="sendButton">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>480</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Send</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Inbox</string>
+     </attribute>
+     <widget class="QLineEdit" name="iSearchLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Search</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="inboxTableView">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>541</width>
+        <height>461</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="reloadPushButton">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>10</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Reload</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>Outbox</string>
+     </attribute>
+     <widget class="QTableView" name="outboxTableView">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>541</width>
+        <height>461</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="oSearchLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Search</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="reloadPushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>10</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Reload</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="nameLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>221</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>693</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_k">
+    <property name="title">
+     <string>Menü</string>
+    </property>
+    <addaction name="actionMinimize_edilebilir"/>
+    <addaction name="separator"/>
+    <addaction name="action_k"/>
+   </widget>
+   <addaction name="menu_k"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_k">
+   <property name="text">
+    <string>Çıkış</string>
+   </property>
+  </action>
+  <action name="actionMinimize_edilebilir">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Minimize edilebilir</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
