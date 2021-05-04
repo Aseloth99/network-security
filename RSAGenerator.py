@@ -24,6 +24,8 @@ class RSAGenerator:
         res=pow(c,d ,n)
 
         self.privateKey=d
+        self.privateP=p
+        self.privateQ=q
         self.publicKey=[e,n]
 
         #print("Public key (e,n)",(e,n))

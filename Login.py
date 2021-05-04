@@ -36,11 +36,10 @@ class Ui_Login(object):
         self.edtLineAppPassword.setMouseTracking(True)
         self.edtLineAppPassword.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.edtLineAppPassword.setInputMask("")
-        self.edtLineAppPassword.setText("KlavyeFL0")
+        self.edtLineAppPassword.setText("KlavyeFL0.")
         self.edtLineAppPassword.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineAppPassword.setReadOnly(False)
         self.edtLineAppPassword.setObjectName("edtLineAppPassword")
-        
 
         self.btnGo = QtWidgets.QPushButton(self.centralwidget)
         self.btnGo.setGeometry(QtCore.QRect(240, 370, 112, 41))
@@ -85,13 +84,11 @@ class Ui_Login(object):
             
             _Login.close()
             
-            
             self.window = QtWidgets.QMainWindow()
             self.ui = Home.Ui_Home()
             self.ui.setupUi(self.window)
             self.window.show()
-            Home.HomeStarter(self.ui,self.window)
-            
+            Home.HomeStarter(self.ui,self.window,self.edtLineMail.text())
             
         except Exception as e:
             print("btnGoClick Except")
@@ -101,7 +98,6 @@ class Ui_Login(object):
             # msg.setText("Error Check Email and Password")
             # x = msg.exec_()
             # msg.setIcon(QMessageBox.Critical)
-
 
 if __name__ == "__main__":
     import sys

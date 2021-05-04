@@ -39,7 +39,6 @@ class Ui_Register(object):
         self.edtTxtGmail.setAlignment(QtCore.Qt.AlignCenter)
         self.edtTxtGmail.setObjectName("edtTxtGmail")
 
-
         self.btnReg = QtWidgets.QPushButton(self.centralwidget)
         self.btnReg.setGeometry(QtCore.QRect(240, 370, 112, 41))
         font = QtGui.QFont()
@@ -111,17 +110,20 @@ class Ui_Register(object):
                         rsaGenerator=RSAGenerator.RSAGenerator()
 
                         FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateKey').set(str(rsaGenerator.privateKey),token=user['idToken']) #Bu Localde Tutulacak
+                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateP').set(str(rsaGenerator.privateP),token=user['idToken']) #Bu Localde Tutulacak
+                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateQ').set(str(rsaGenerator.privateQ),token=user['idToken']) #Bu Localde Tutulacak
                         FBConf.db.child("User").child(user['localId']).child("RSA").child('PublicKey').set(str(rsaGenerator.publicKey[0]),token=user['idToken'])
                         FBConf.db.child("User").child(user['localId']).child("RSA").child('n').set(str(rsaGenerator.publicKey[1]),token=user['idToken'])
                         ###
                         
                         #Kullanıcı RSA public keyi RootRSA private key tarafından imzalandı
                         
-                        RootRSAPrivate=FBConf.db.child("RootRSA").child("private").get().val() 
                         RootRSAN=FBConf.db.child("RootRSA").child("n").get().val() 
                         RootRSAPublic=FBConf.db.child("RootRSA").child("public").get().val() 
-                        
-                        signatureObj = Signature.Signature(RootRSAN,RootRSAPublic,RootRSAPrivate)
+                        RootRSAPrivate=FBConf.db.child("RootRSA").child("private").get().val() 
+
+
+                        signatureObj = Signature.Signature(RootRSAN,RootRSAPublic,RootRSAPrivate) #n,e,d
                         signature=signatureObj.Signaturing(rsaGenerator.publicKey[1]) #n'yi alıyor   Public key (e,n) ,e hepsinde aynı çünkü
                         
                         # if signatureObj.Verify(signature,rsaGenerator.publicKey[1]):
