@@ -25,7 +25,7 @@ class Ui_Login(object):
         self.edtLineMail.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineMail.setReadOnly(False)
         self.edtLineMail.setObjectName("edtLineMail")
-        self.edtLineMail.setText("mustafaacik92@gmail.com")
+        self.edtLineMail.setText("klavyefl@gmail.com")
 
         self.edtLineAppPassword = QtWidgets.QLineEdit(self.centralwidget)
         self.edtLineAppPassword.setGeometry(QtCore.QRect(20, 200, 550, 41))
@@ -36,7 +36,7 @@ class Ui_Login(object):
         self.edtLineAppPassword.setMouseTracking(True)
         self.edtLineAppPassword.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.edtLineAppPassword.setInputMask("")
-        self.edtLineAppPassword.setText("")
+        self.edtLineAppPassword.setText("KlavyeFL0")
         self.edtLineAppPassword.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineAppPassword.setReadOnly(False)
         self.edtLineAppPassword.setObjectName("edtLineAppPassword")
@@ -74,8 +74,6 @@ class Ui_Login(object):
         self.edtLineAppPassword.setPlaceholderText(_translate("Login","App Password"))
 
     def btnGoClick(self,_Login): #buton register click
-        self.edtLineMail.text()
-        self.edtLineAppPassword.text()
 
         try:
             FBConf.auth.sign_in_with_email_and_password(self.edtLineMail.text(), self.edtLineAppPassword.text())

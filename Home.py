@@ -33,35 +33,36 @@ class HomeStarter():
     def GetTargetPublicKey(self):
         print("aaa")
         users=FBConf.db.child("User").get()
-        print(users.val())
 
         for user in users.each():
-            print("user.key()   ",user.key())
+
             if user.val()["Gmail"] == self.ui.toLineEdit.text():
                 self.targetDBKey=user.key()
                 self.targetN=user.val()["RSA"]["n"]
                 self.targetPublicKey=user.val()["RSA"]["PublicKey"]
                 self.targetEmail=self.ui.toLineEdit.text()
-                print(self.targetEmail)
-                break
                 
-        print(self.targetN)
-    
+                break
 
     def CheckAES(self):
         user = FBConf.auth.current_user
-        self.targetAESKey=binascii.unhexlify(FBConf.db.child("AES").child(user['localId']).child(self.targetEmail).get(token=user['idToken']).val())
+        try:
+            print("FBConf.db.child(AES).child(user['localId']).child(self.targetDBKey).get(token=user['idToken']).val()   ",FBConf.db.child("AES").child(user['localId']).child(self.targetDBKey).get(token=user['idToken']).val())
+            self.targetAESKey=(FBConf.db.child("AES").child(user['localId']).child(self.targetDBKey).get(token=user['idToken']).val())
+            return True
+        except:return False
+            
 
     def CreateAndGetAES(self):
+        print("CreateAndGetAES")
         user = FBConf.auth.current_user
         self.targetAESKey = os.urandom(32)
-        print(binascii.hexlify(self.targetAESKey))
 
-        FBConf.db.child("AES").child(user['localId']).child(self.targetEmail).push(binascii.hexlify(self.targetAESKey),token=user['idToken'])
+        FBConf.db.child("AES").child(user['localId']).child(self.targetDBKey).set(str(self.targetAESKey),token=user['idToken'])
     
     def AESEncryption(self):
         subject=self.ui.subjectLineEdit.text()
-        body=self.ui.messageTextEdit.text()
+        body=self.ui.messageTextEdit.toPlainText()
         
         #(ciphertext, nonce, authTag)
         self.encSubjectAES=AES.AESCipher.encrypt_AES_GCM(subject,self.targetAESKey)
@@ -81,15 +82,20 @@ class HomeStarter():
                 print(e)
                 print("Geçersiz Target Email")
             
+            
             try:
-                self.CheckAES()
-
+                if self.CheckAES():
+                    pass
+                
+                else:
+                    self.CreateAndGetAES()
+                
             except:
                 self.CreateAndGetAES()
             
+            
             self.AESEncryption()
-
-                
+            
 
             
         '''
