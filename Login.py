@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+#from PyQt5.QtWidgets import QMessageBox
 import FBConf
-import Home
+import Home,sys
 
 class Ui_Login(object):
     def setupUi(self,Login):
@@ -12,6 +12,8 @@ class Ui_Login(object):
         self.centralwidget.setObjectName("centralwidget")
         font = QtGui.QFont()
         font.setPointSize(16)
+        
+        Login.setAcceptDrops(True)
 
         self.edtLineMail = QtWidgets.QLineEdit(self.centralwidget)
         self.edtLineMail.setGeometry(QtCore.QRect(150, 40, 311, 41))
@@ -100,10 +102,11 @@ class Ui_Login(object):
             # msg.setIcon(QMessageBox.Critical)
 
 if __name__ == "__main__":
-    import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Login = QtWidgets.QMainWindow()
-    ui = Ui_Login()
-    ui.setupUi(Login)
-    Login.show()
+    ex = Ui_Login()
+    w = QtWidgets.QMainWindow()
+    ex.setupUi(w)
+    w.show()
     sys.exit(app.exec_())

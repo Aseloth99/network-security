@@ -49,7 +49,7 @@ class Ui_Main(object):
         
         RegisterorLogin.setWindowTitle(_translate("RegisterorLogin", "Register Or Login"))
         self.btnLogIn.setText(_translate("RegisterorLogin", "Login"))
-        self.btnRegister.setText(_translate("RegisterorLogin", "Resgister"))
+        self.btnRegister.setText(_translate("RegisterorLogin", "Register"))
 
     def openLogin(self, _RegisterorLogin,numberSFBURun):
         _RegisterorLogin.close()

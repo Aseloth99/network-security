@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'arayüz.ui'
+# Form implementation generated from reading ui file 'c:\Users\Windows\Desktop\Cryptografy Mail\arayüz.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -69,15 +69,17 @@ class Ui_Home(object):
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        self.outboxTableView = QtWidgets.QTableView(self.tab_3)
-        self.outboxTableView.setGeometry(QtCore.QRect(10, 40, 541, 461))
-        self.outboxTableView.setObjectName("outboxTableView")
         self.oSearchLineEdit = QtWidgets.QLineEdit(self.tab_3)
         self.oSearchLineEdit.setGeometry(QtCore.QRect(10, 10, 161, 20))
         self.oSearchLineEdit.setObjectName("oSearchLineEdit")
         self.reloadPushButton_2 = QtWidgets.QPushButton(self.tab_3)
         self.reloadPushButton_2.setGeometry(QtCore.QRect(470, 10, 75, 23))
         self.reloadPushButton_2.setObjectName("reloadPushButton_2")
+        self.outboxTableView = QtWidgets.QTableWidget(self.tab_3)
+        self.outboxTableView.setGeometry(QtCore.QRect(0, 40, 661, 461))
+        self.outboxTableView.setObjectName("outboxTableView")
+        self.outboxTableView.setColumnCount(0)
+        self.outboxTableView.setRowCount(0)
         self.tabWidget.addTab(self.tab_3, "")
         self.nameLabel = QtWidgets.QLabel(self.centralwidget)
         self.nameLabel.setGeometry(QtCore.QRect(10, 0, 221, 31))
@@ -104,7 +106,7 @@ class Ui_Home(object):
         self.menubar.addAction(self.menu_k.menuAction())
 
         self.retranslateUi(Home)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(Home)
 
     def retranslateUi(self, Home):
@@ -127,13 +129,3 @@ class Ui_Home(object):
         self.menu_k.setTitle(_translate("Home", "Menü"))
         self.action_k.setText(_translate("Home", "Çıkış"))
         self.actionMinimize_edilebilir.setText(_translate("Home", "Minimize edilebilir"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Home = QtWidgets.QMainWindow()
-    ui = Ui_Home()
-    ui.setupUi(Home)
-    Home.show()
-    sys.exit(app.exec_())
