@@ -76,25 +76,25 @@ class Ui_Login(object):
 
     def btnGoClick(self,_Login): #buton register click
 
-        try:
-            FBConf.auth.sign_in_with_email_and_password(self.edtLineMail.text(), self.edtLineAppPassword.text())
-            user = FBConf.auth.current_user
-            '''
-            import quickstart
-            quickstart.main()
-            '''
+        #try:
+        FBConf.auth.sign_in_with_email_and_password(self.edtLineMail.text(), self.edtLineAppPassword.text())
+        user = FBConf.auth.current_user
+        '''
+        import quickstart
+        quickstart.main()
+        '''
+        
+        _Login.close()
+        
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Home.Ui_Home()
+        self.ui.setupUi(self.window)
+        self.window.show()
+        Home.HomeStarter(self.ui,self.window,self.edtLineMail.text())
             
-            _Login.close()
-            
-            self.window = QtWidgets.QMainWindow()
-            self.ui = Home.Ui_Home()
-            self.ui.setupUi(self.window)
-            self.window.show()
-            Home.HomeStarter(self.ui,self.window,self.edtLineMail.text())
-            
-        except Exception as e:
-            print("btnGoClick Except")
-            print(e)
+        # except Exception as e:
+        #     print(e)
+        #     print("Oops!", e.__class__, "occurred.")
             # msg = QMessageBox()
             # msg.setWindowTitle("Error")
             # msg.setText("Error Check Email and Password")

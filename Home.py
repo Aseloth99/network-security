@@ -1,8 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog,QTableWidgetItem 
 from PyQt5.QtCore import Qt
-import os, binascii
-import sys
+import os, time
+import sys, binascii
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -10,14 +10,51 @@ from email.mime.base import MIMEBase
 from email import encoders
 from validate_email import validate_email
 from base64 import b64encode,b64decode
-import time
-import mspDenemeAesFileEnc
 
+import mspDenemeAesFileEnc
 import FBConf
 import AES, SHA256, RSA
 
-os.system("pyuic5 -x arayüz.ui -o uiHome.py")
+#os.system("pyuic5 -x arayüz.ui -o uiHome.py")
 from uiHome import Ui_Home  #import interface
+
+class OutboxObject: 
+    def __init__(self, myId, to, subject, body, timeStamp, hashSubject, hashBody, hashTimeStamp, encRSAaes, 
+    fromPublicN, fromSignature, hashEncRSAaes, hashFromPublicN, hashFromSignature ): 
+
+        self.id = myId 
+        self.to = to 
+        self.subject = subject 
+        self.body = body 
+        self.timeStamp = timeStamp
+        self.hashSubject = hashSubject
+        self.hashBody = hashBody
+        self.hashTimeStamp = hashTimeStamp
+        self.encRSAaes = encRSAaes
+        self.fromPublicN = fromPublicN
+        self.fromSignature = fromSignature
+        self.hashEncRSAaes = hashEncRSAaes
+        self.hashFromPublicN = hashFromPublicN
+        self.hashFromSignature = hashFromSignature
+
+class InboxObject: 
+    def __init__(self, myId, From, subject, body, timeStamp, hashSubject, hashBody, hashTimeStamp, encRSAaes, 
+    fromPublicN, fromSignature, hashEncRSAaes, hashFromPublicN, hashFromSignature ): 
+
+        self.id = myId
+        self.From = From 
+        self.subject = subject 
+        self.body = body 
+        self.timeStamp = timeStamp
+        self.hashSubject = hashSubject
+        self.hashBody = hashBody
+        self.hashTimeStamp = hashTimeStamp
+        self.encRSAaes = encRSAaes
+        self.fromPublicN = fromPublicN
+        self.fromSignature = fromSignature
+        self.hashEncRSAaes = hashEncRSAaes
+        self.hashFromPublicN = hashFromPublicN
+        self.hashFromSignature = hashFromSignature
 
 class HomeStarter(QtWidgets.QMainWindow):
     def __init__(self,ui,window,myEmail):
@@ -34,18 +71,20 @@ class HomeStarter(QtWidgets.QMainWindow):
         self.targetN=""
         self.myEmail=myEmail
         self.filename=""
-        self.loadView()
+        self.inboxMails=[]
+        self.outboxMails=[]
         
+        self.DBGetInbox()
+        self.DBGetOutbox()
      #self.showMaximized()
         #self.threading()
         #self.themes=["windowsvista","Windows","Fusion","Koyu","Açık"]
         
-    #Gönderme  Baş
+    #Gönderme Başlangıç
 
     def GetUserName(self):
         self.user = FBConf.auth.current_user
         self.ui.nameLabel.setText("Welcome "+str(FBConf.db.child("User").child(self.user['localId']).child('Username').get(token=self.user['idToken']).val()))
-
 
     def SendMail(self):
         if validate_email(self.ui.toLineEdit.text()):
@@ -53,8 +92,7 @@ class HomeStarter(QtWidgets.QMainWindow):
             try:
                 self.GetTargetPublicKey()
             except:
-                print("Geçersiz Target Email")
- 
+                pass
             try:
                 if self.CheckAES():
                     pass
@@ -71,7 +109,7 @@ class HomeStarter(QtWidgets.QMainWindow):
 
             self.GoSendMail()
 
-            self.GetPassword()
+            #self.GetPassword()
 
     def GetTargetPublicKey(self):
 
@@ -96,7 +134,6 @@ class HomeStarter(QtWidgets.QMainWindow):
         dlg.setFileMode(QFileDialog.ExistingFiles)
         if dlg.exec_():
             self.InputFiles = dlg.selectedFiles()
-            print(self.InputFiles)
             tmp = ""
             for i in self.InputFiles:
                 tmp += os.path.basename(i)
@@ -121,35 +158,67 @@ class HomeStarter(QtWidgets.QMainWindow):
         #(ciphertext, nonce, authTag)
         self.encSubjectAES = AES.AESCipher.encrypt_AES_GCM(self,subject, self.targetAESKey)
         self.encBodyAES = AES.AESCipher.encrypt_AES_GCM(self,body, self.targetAESKey)
+        print(self.encSubjectAES,self.encBodyAES)
+        print(len(self.encSubjectAES[0]))
+        print(len(self.encSubjectAES[1]))
+        print(len(self.encSubjectAES[2]))
+        print(len(self.encBodyAES[0]))
+        print(len(self.encBodyAES[1]))
+        print(len(self.encBodyAES[2]))
+        #print("self.encSubjectAES",self.encSubjectAES[0])
+        #print(type(self.encSubjectAES[0]))
+        #print(len(self.encSubjectAES[0]))
+        #liste=[]
+        self.encSubjectAESstr=""
+        self.encBodyAESstr=""
+
+        for i in self.encSubjectAES:
+            #liste.append(b64encode(i).decode('utf-8'))
+            self.encSubjectAESstr+=b64encode(i).decode('utf-8')+"₺"
+            
+        for j in self.encBodyAES:
+            self.encBodyAESstr+=b64encode(j).decode('utf-8')+"₺"
+
+        #print(liste)
+        print(self.encSubjectAESstr)
+        print(self.encBodyAESstr)
+        #print(type(liste[0]))
+
+        # for c,i in enumerate(liste):
+        #     liste[c]=b64decode(i)
+        # print("decode",liste)
+        # print(liste[0])
+        # print(type(liste[0]))
+        # print(len(liste[0]))
 
     def SaveMailToDB(self):
         ts = time.time()
-        outboxData={"To":str(self.targetEmail),"Subject":str(self.encSubjectAES),"Body":str(self.encBodyAES),"TimeStamp":str(ts),"AES":str(self.targetAESKey),
-            "HashTo":str(self.hash(self.targetEmail)),"HashSubject":str(self.hash(self.encSubjectAES)),"HashBody":str(self.hash(self.encBodyAES)),
-            "HashTimeStamp":str(self.hash(ts)),"HashAES":str(self.hash(self.targetAESKey))
-            }
-        FBConf.db.child("Outbox").child(self.user['localId']).child(self.targetDBKey).push(outboxData)
-        #Şu ana kadar gönderen kişinin outboxına düştü
-        
+        print(self.targetAESKey)
         EncRSAaes=RSA.RS.encryptMsg(self.targetAESKey,int(self.targetN),int(self.targetPublicKey))
+        EncRSAaes=b64encode(EncRSAaes).decode('utf-8')
 
         myRSAN=FBConf.db.child("User").child(self.user['localId']).child("RSA").child('n').get(token=self.user['idToken']).val()
         fromSignature=FBConf.db.child("User").child(self.user['localId']).child("RSASignature").get(token=self.user['idToken']).val()
 
-        inboxData={"From":str(self.myEmail),"Subject":str(self.encSubjectAES),"Body":str(self.encBodyAES),"TimeStamp":str(ts),
+        inboxData={"From":str(self.myEmail),"Subject":self.encSubjectAESstr,"Body":str(self.encBodyAESstr),"TimeStamp":str(ts),
             "HashFrom":str(self.hash(self.myEmail)),"HashSubject":str(self.hash(self.encSubjectAES)),"HashBody":str(self.hash(self.encBodyAES)),
             "HashTimeStamp":str(self.hash(ts)),"EncRSAaes":str(EncRSAaes),"FromPublicN":str(myRSAN),"FromSignature":str(fromSignature),
             "HashEncRSAaes":str(self.hash(EncRSAaes)),"HashFromPublicN":str(self.hash(myRSAN)),"HashFromSignature":str(self.hash(fromSignature))
-                }
+        }
+
+        outboxData={"To":str(self.targetEmail),"Subject":str(self.encSubjectAES),"Body":str(self.encBodyAES),"TimeStamp":str(ts),
+            "HashTo":str(self.hash(self.targetEmail)),"HashSubject":str(self.hash(self.encSubjectAES)),"HashBody":str(self.hash(self.encBodyAES)),
+            "HashTimeStamp":str(self.hash(ts)),"EncRSAaes":str(EncRSAaes),"FromPublicN":str(myRSAN),"HashEncRSAaes":str(self.hash(EncRSAaes)),
+            "HashFromPublicN":str(self.hash(myRSAN)),"FromSignature":str(fromSignature),"HashFromSignature":str(self.hash(fromSignature))
+        }
 
         self.childKey=FBConf.db.generate_key()
 
-        IdFbDb4Target=FBConf.db.child("Inbox").child(self.targetDBKey).child(self.user['localId']).child(self.childKey).set(inboxData)
-        fbDb4Own=FBConf.db.child("Outbox").child(self.user['localId']).child(self.targetDBKey).child(self.childKey).set(inboxData)
+        FBConf.db.child("Inbox").child(self.targetDBKey).child(self.user['localId']).child(self.childKey).set(inboxData)
+        FBConf.db.child("Outbox").child(self.user['localId']).child(self.targetDBKey).child(self.childKey).set(outboxData)
 
     def hash(self,text):
            #filename classname funcname
-        #print(SHA256.SHA256().encrypter(text))
         return SHA256.SHA256().encrypter(str(text))
 
     def GoSendMail(self):
@@ -191,7 +260,7 @@ class HomeStarter(QtWidgets.QMainWindow):
             
             self.ui.subjectLineEdit.clear()
             self.ui.messageTextEdit.clear()
-            self.ui.messageTextEdit.setPlaceholderText("Mailiniz gönderildi.")
+            self.ui.messageTextEdit.setPlaceholderText("Mailiniz başarılı bir şekilde gönderildi.")
             
         except Exception as e:
             print(e)
@@ -200,71 +269,177 @@ class HomeStarter(QtWidgets.QMainWindow):
 
     def PutFiletoDB(self,filename):
 
-        FBConf.storage.child("Outbox").child(self.user['localId']).child(self.targetDBKey).child(self.childKey).child(filename.split("/").pop()).put(filename)
+        FBConf.storage.child("Outbox").child(self.user['localId']).child(self.targetDBKey).child(self.childKey).child(filename.split("/").pop()).put(self.filename)
         FBConf.storage.child("InBox").child(self.targetDBKey).child(self.user['localId']).child(self.childKey).child(filename.split("/").pop()).put(filename)
 
     def GetPassword():
         pass
 
-    # def dragEnterEvent(self, event):
-    #     if event.mimeData().hasUrls():
-    #         event.accept()
-    #     else:
-    #         event.ignore()
-    # def dropEvent(self, event):
-    #     files = [u.toLocalFile() for u in event.mimeData().urls()]
-    #     for f in files:
-    #         self.filename=f
-
     #Gönderme Son
+    
+    def RSADecryption(self,encRSAaes):  #encRSAaes,   n,publickey,privatekey,privateP,privateQ
+        
+        RSAInfos=FBConf.db.child("User").child(self.user['localId']).child("RSA").get().val()
+        
+        privatekey,privateP,privateQ,publickey,n=RSAInfos.values()    
+        print(encRSAaes)   
+        AesKey=RSA.RS.decryptMsg(b64decode(encRSAaes),int(n),int(publickey),int(privatekey),int(privateP),int(privateQ))
 
-    def AESDecryption(self,encText,targetAESKey): 
-        pass
+        print("RSADecryption3")
+        print("AESKEY",AesKey)
+        return AesKey
+
+    def AESDecryption(self,encText,encText2,encRSAaes):
+        AesKey = self.RSADecryption(encRSAaes)
+        print(encText, encText2)
+        newEncText=[]
+        for i in encText.split("₺"):
+            
+            print(i)
+            newEncText.append(b64decode(i))
+
+        a,b,c,_ = newEncText
+        
+        print("A: ",a)
+        print(type(a))
+        print(len(a))
+        print("B: ",b)
+        print(type(b))
+        print(len(b))
+        print("C: ",c)
+        print(type(c))
+        print(len(c))
+
+        newEncText=(a,b,c)
+
+        print("newEncText   ",newEncText)
+        print("targetAESKey     ",AesKey)
+
+        decSubjectAES = AES.AESCipher.decrypt_AES_GCM(self, newEncText, AesKey)
+
+        print("AESDecryption1")
+
+        newEncText2=[]
+        for i in encText2.split("₺"):
+            newEncText2.append(b64decode(i))
+        a,b,c,_ = newEncText2
+        newEncText2=(a,b,c)
+        decBodyAES = AES.AESCipher.decrypt_AES_GCM(self, newEncText2, AesKey)
+        
+        print(decSubjectAES, decBodyAES)
+        return decSubjectAES, decBodyAES
     
     def DBGetInbox(self):
+
         myInboxs=FBConf.db.child("Inbox").child(self.user['localId']).get(token=self.user['idToken'])
-        mails=[]
-        for myInbox in myInboxs.each():
-            for elementInbox in myInbox.each():
-
-                mails.add(
-                    "From":elementInbox.val()["From"],
-                    "Subject":elementInbox.val()["Subject"],
-                    "Body":elementInbox.val()["Body"],
-                    "TimeStamp":elementInbox.val()["TimeStamp"],
-                    "HashSubject":elementInbox.val()["HashSubject"],
-                    "HashBody":elementInbox.val()["HashBody"],
-                    "HashTimeStamp":elementInbox.val()["HashTimeStamp"],
-                    "EncRSAaes":elementInbox.val()["EncRSAaes"],
-                    "FromPublicN":elementInbox.val()["FromPublicN"]
-                    "FromSignature":elementInbox.val()["FromSignature"],
-                    "HashEncRSAaes":elementInbox.val()["HashEncRSAaes"],
-                    "HashFromPublicN":elementInbox.val()["HashFromPublicN"],
-                    "HashFromSignature":elementInbox.val()["HashFromSignature"]
-                )
+        id=0
+        try:
+            for myInbox in myInboxs.each():
+                targetAESKey=FBConf.db.child("AES").child(self.user['localId']).child(myInbox.key()).get().val()
                 
-        #Tüm veriler mails sözlüğünün içinde kardeş
-
-               
+                inboxDict = myInbox.val()
                 
-    
+                for i in inboxDict.values():
+                    print(targetAESKey)
+                    decSubjectAES, decBodyAES= self.AESDecryption(i["Subject"],i["Body"],i["EncRSAaes"])
+                    i["Subject"] = str(decSubjectAES)
+                    i["Body"] = str(decBodyAES)
+                    self.inboxMails.append(
+                        InboxObject(
+                            id,
+                            i["From"],
+                            i["Subject"],
+                            i["Body"],
+                            i["TimeStamp"],
+                            i["HashSubject"],
+                            i["HashBody"],
+                            i["HashTimeStamp"],
+                            i["EncRSAaes"],
+                            i["FromPublicN"],
+                            i["FromSignature"],
+                            i["HashEncRSAaes"],
+                            i["HashFromPublicN"],
+                            i["HashFromSignature"]
+                        )
+                    )
+                    id+=1
+            print("DBGetInbox3")
+            self.inboxLoadView()
 
-    def loadView(self):
-        mails =[{"subject":"selamlar1", "body":232},
-                {"subject":"selamlar2", "body":232},
-                {"subject":"selamlar3", "body":232}]
-            
-        self.ui.inboxTableView.setRowCount(len(mails))
-        self.ui.inboxTableView.setColumnCount(2)
+        except Exception as e:
+            print(e,"inbox")
+            print("Oops!", e.__class__, "occurred.")
+
+    def DBGetOutbox(self):
+
+        myOutboxs=FBConf.db.child("Outbox").child(self.user['localId']).get(token=self.user['idToken'])
+        id=0
+        try:
+            for myOutbox in myOutboxs.each():
+                
+                outboxDict = myOutbox.val()
+                
+                for i in outboxDict.values():
+                    EncRSAaes=i["EncRSAaes"]
+                    
+                    #decSubjectAES, decBodyAES= self.AESDecryption(i["Subject"],i["Body"],i["EncRSAaes"])
+                    #i["Subject"] = str(decSubjectAES)
+                    #i["Body"] = str(decBodyAES)
+                    self.outboxMails.append(
+                        OutboxObject(
+                            id,
+                            i["To"],
+                            i["Subject"],
+                            i["Body"],
+                            i["TimeStamp"],
+                            i["HashSubject"],
+                            i["HashBody"],
+                            i["HashTimeStamp"],
+                            i["EncRSAaes"],
+                            i["FromPublicN"],
+                            i["FromSignature"],
+                            i["HashEncRSAaes"],
+                            i["HashFromPublicN"],
+                            i["HashFromSignature"]
+                        )
+                    )
+                    id+=1
+            self.outboxLoadView()
+        except Exception as e:
+            print(e)
+            print("Oops!", e.__class__, "occurred.")
+
+    def inboxLoadView(self):
+        self.ui.inboxTableView.setRowCount(len(self.inboxMails))
+        self.ui.inboxTableView.setColumnCount(4)
         self.ui.inboxTableView.setGridStyle(Qt.NoPen)
-        self.ui.inboxTableView.setHorizontalHeaderLabels(("subject","body"))
-        self.ui.inboxTableView.setColumnWidth(0,200)
-        self.ui.inboxTableView.setColumnWidth(1,400)
+        self.ui.inboxTableView.setHorizontalHeaderLabels(("From","Subject","Body","Timestamp"))
+        self.ui.inboxTableView.setColumnWidth(0,100)
+        self.ui.inboxTableView.setColumnWidth(1,300)
 
         rowIndex = 0
-        for mail in mails:
-            self.ui.inboxTableView.setItem(rowIndex,0,QTableWidgetItem(mail["subject"]))
-            self.ui.inboxTableView.setItem(rowIndex,1,QTableWidgetItem(str(mail["body"])))
+        for mail in self.inboxMails:
+            self.ui.inboxTableView.setItem(rowIndex,0,QTableWidgetItem(mail.From))
+            self.ui.inboxTableView.setItem(rowIndex,1,QTableWidgetItem(mail.subject))
+            self.ui.inboxTableView.setItem(rowIndex,2,QTableWidgetItem(mail.body))
+            self.ui.inboxTableView.setItem(rowIndex,3,QTableWidgetItem(mail.timeStamp))
+            rowIndex+=1
+
+    def outboxLoadView(self):
+        
+        self.ui.outboxTableView.setRowCount(len(self.outboxMails))
+        self.ui.outboxTableView.setColumnCount(4)
+        self.ui.outboxTableView.setGridStyle(Qt.NoPen)
+        self.ui.outboxTableView.setHorizontalHeaderLabels(("To","Subject","Body","Timestamp"))
+        self.ui.outboxTableView.setColumnWidth(0,100)
+        self.ui.outboxTableView.setColumnWidth(1,300)
+
+        rowIndex = 0
+        for mail in self.outboxMails:
+            self.ui.outboxTableView.setItem(rowIndex,0,QTableWidgetItem(mail.to))
+            self.ui.outboxTableView.setItem(rowIndex,1,QTableWidgetItem(mail.subject))
+            self.ui.outboxTableView.setItem(rowIndex,2,QTableWidgetItem(mail.body))
+            self.ui.outboxTableView.setItem(rowIndex,3,QTableWidgetItem(mail.timeStamp))
             rowIndex+=1
 
 #if __name__ == "__main__":
