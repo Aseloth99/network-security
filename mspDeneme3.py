@@ -1,7 +1,5 @@
-import FBConf
+import uuid
 
-
-
-print(FBConf.db.generate_key())
-
-FBConf.db.child("Emrah Koş").child(FBConf.db.generate_key()).set("asd")
+print(uuid.uuid1())
+print(uuid.uuid1())
+print(uuid.uuid1())

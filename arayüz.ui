@@ -164,10 +164,10 @@
        <string>Search</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="reloadPushButton">
+     <widget class="QPushButton" name="reloadInbox">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>210</x>
         <y>10</y>
         <width>75</width>
         <height>23</height>
@@ -205,10 +205,10 @@
        <string>Search</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="reloadPushButton_2">
+     <widget class="QPushButton" name="reloadOutbox">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>190</x>
         <y>10</y>
         <width>75</width>
         <height>23</height>
