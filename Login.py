@@ -38,7 +38,7 @@ class Ui_Login(object):
         self.edtLineAppPassword.setMouseTracking(True)
         self.edtLineAppPassword.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.edtLineAppPassword.setInputMask("")
-        self.edtLineAppPassword.setText("KlavyeFL0.")
+        self.edtLineAppPassword.setText("123456")
         self.edtLineAppPassword.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineAppPassword.setReadOnly(False)
         self.edtLineAppPassword.setObjectName("edtLineAppPassword")
@@ -79,10 +79,6 @@ class Ui_Login(object):
         #try:
         FBConf.auth.sign_in_with_email_and_password(self.edtLineMail.text(), self.edtLineAppPassword.text())
         user = FBConf.auth.current_user
-        '''
-        import quickstart
-        quickstart.main()
-        '''
         
         _Login.close()
         
