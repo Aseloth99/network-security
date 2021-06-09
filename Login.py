@@ -23,11 +23,11 @@ class Ui_Login(object):
         self.edtLineMail.setMouseTracking(True)
         self.edtLineMail.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.edtLineMail.setInputMask("")
-        self.edtLineMail.setText("")
+        self.edtLineMail.setText("klavyefl@gmail.com")
         self.edtLineMail.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineMail.setReadOnly(False)
         self.edtLineMail.setObjectName("edtLineMail")
-        self.edtLineMail.setText("klavyefl@gmail.com")
+       
 
         self.edtLineAppPassword = QtWidgets.QLineEdit(self.centralwidget)
         self.edtLineAppPassword.setGeometry(QtCore.QRect(20, 200, 550, 41))
@@ -39,6 +39,7 @@ class Ui_Login(object):
         self.edtLineAppPassword.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.edtLineAppPassword.setInputMask("")
         self.edtLineAppPassword.setText("123456")
+        
         self.edtLineAppPassword.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineAppPassword.setReadOnly(False)
         self.edtLineAppPassword.setObjectName("edtLineAppPassword")
@@ -79,14 +80,17 @@ class Ui_Login(object):
         #try:
         FBConf.auth.sign_in_with_email_and_password(self.edtLineMail.text(), self.edtLineAppPassword.text())
         user = FBConf.auth.current_user
-        
+
+        cryptoKey=FBConf.db.child("User").child(user['localId']).child("CyrptologyKey").get().val()
+        print("Login cryptoKeyi ",cryptoKey)
+
         _Login.close()
         
         self.window = QtWidgets.QMainWindow()
         self.ui = Home.Ui_Home()
         self.ui.setupUi(self.window)
         self.window.show()
-        Home.HomeStarter(self.ui,self.window,self.edtLineMail.text())
+        Home.HomeStarter(self.ui,self.window,self.edtLineMail.text(),cryptoKey)
             
         # except Exception as e:
         #     print(e)

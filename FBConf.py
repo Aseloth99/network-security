@@ -1,5 +1,5 @@
 import pyrebase
-
+#FB konfigurasyon dosyası
 pyrebaseConfig = {
     "apiKey": "AIzaSyBRJf30qwB-ExBLryAYxLsNLllbEnF7IZM",
     "authDomain": "network-security-mail.firebaseapp.com",

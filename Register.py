@@ -6,6 +6,8 @@ import RSAGenerator
 import sqlite3
 import Signature
 from base64 import b64encode,b64decode
+import Cryptology
+import time
 
 class Ui_Register(object):
     def setupUi(self, Register):
@@ -102,27 +104,47 @@ class Ui_Register(object):
 
                     else:
                         user= FBConf.auth.create_user_with_email_and_password(gmail,password)
+
+
                         #Kullanıcı Oluşturuldu username ve gmail adresleri kaydedildi
                         FBConf.db.child("User").child(user['localId']).child('Username').set(username,token=user['idToken'])
                         FBConf.db.child("User").child(user['localId']).child('Gmail').set(gmail,token=user['idToken'])
+                        
+                        cryptoKey=Cryptology.KeyMaker()
+                        FBConf.db.child("User").child(user['localId']).child('CyrptologyKey').set(cryptoKey,token=user['idToken'])
                         ###
 
                         #Kullanıcı için RSA keyler oluşturuldu ve database kaydedidli
                         rsaGenerator=RSAGenerator.RSAGenerator()
 
-                        con = sqlite3.connect("Key.db") # Tabloya bağlanıyoruz.
-                        cursor = con.cursor()
-                        cursor.execute("CREATE TABLE IF NOT EXISTS Key (PrivateKey Text,PrivateP Text, PrivateQ Text,PublicKey Text,n Text)") 
-                        con.commit() #execute sorgusunun çalışması için
-                        #cursor.execute(f"Insert into Key Values({str(rsaGenerator.privateKey)},{str(rsaGenerator.privateP)},{str(rsaGenerator.privateQ)},{str(rsaGenerator.publicKey[0])},{str(rsaGenerator.publicKey[1])})")
-                        con.commit()
+                        # con = sqlite3.connect("Key.db") # Tabloya bağlanıyoruz.
+                        # cursor = con.cursor()
+                        # cursor.execute("CREATE TABLE IF NOT EXISTS Key (PrivateKey Text,PrivateP Text, PrivateQ Text,PublicKey Text,n Text)") 
+                        # con.commit() #execute sorgusunun çalışması için
+                        # #cursor.execute(f"Insert into Key Values({str(rsaGenerator.privateKey)},{str(rsaGenerator.privateP)},{str(rsaGenerator.privateQ)},{str(rsaGenerator.publicKey[0])},{str(rsaGenerator.publicKey[1])})")
+                        # con.commit()
 
-                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateKey').set(str(rsaGenerator.privateKey),token=user['idToken']) #Bu Localde Tutulacak
-                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateP').set(str(rsaGenerator.privateP),token=user['idToken']) #Bu Localde Tutulacak
-                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PrivateQ').set(str(rsaGenerator.privateQ),token=user['idToken']) #Bu Localde Tutulacak
-                        FBConf.db.child("User").child(user['localId']).child("RSA").child('PublicKey').set(str(rsaGenerator.publicKey[0]),token=user['idToken'])
-                        FBConf.db.child("User").child(user['localId']).child("RSA").child('n').set(str(rsaGenerator.publicKey[1]),token=user['idToken'])
-                        ###
+                        fileInfos = open("Keys.txt", "w+", encoding="UTF-16")
+                        
+                        TimeStamp=time.time()
+
+                        EncPrivateKey = Cryptology.Encrypt(str(rsaGenerator.privateKey),cryptoKey)
+                        EncPrivateP = Cryptology.Encrypt(str(rsaGenerator.privateP),cryptoKey)
+                        EncPrivateQ = Cryptology.Encrypt(str(rsaGenerator.privateQ),cryptoKey)
+                        EncN = Cryptology.Encrypt(str(rsaGenerator.publicKey[1]),cryptoKey)
+                        EncPublicKey = Cryptology.Encrypt(str(rsaGenerator.publicKey[0]),cryptoKey)
+                        EncTimeStamp = Cryptology.Encrypt(str(TimeStamp),cryptoKey)
+
+                        fileInfos.write(EncPrivateKey+"\n")
+                        fileInfos.write(EncPrivateP+"\n")
+                        fileInfos.write(EncPrivateQ+"\n")
+                        fileInfos.write(EncN+"\n")
+                        fileInfos.write(EncPublicKey+"\n")
+                        fileInfos.write(EncTimeStamp)
+                        fileInfos.close()
+
+                        PublicRSAInfos={"PublicKey":str(rsaGenerator.publicKey[0]),"n":str(rsaGenerator.publicKey[1]),"Timestamp":TimeStamp}
+                        FBConf.db.child("Rings").child(user['localId']).push(PublicRSAInfos)
                         
                         #Kullanıcı RSA public keyi RootRSA private key tarafından imzalandı
                         
@@ -134,17 +156,8 @@ class Ui_Register(object):
                         signature=signatureObj.Signaturing(gmail) #n'yi alıyor   Public key (e,n) ,e hepsinde aynı çünkü
 
                         myNewObj=Signature.Verifyer(RootRSAN,RootRSAPublic)
-
-                        print("gmail    ",gmail)
-                        print("signature    ",signature)
-                        print(myNewObj.Verify(signature,gmail))
-
                         signature = b64encode(signature).decode('utf-8')
-                        # if signatureObj.Verify(signature,rsaGenerator.publicKey[1]):
-                        #     print("İmza Doğru")
-                        # else:
-                        #     print("İmza Yanlış")
-
+                        
                         FBConf.db.child("User").child(user['localId']).child('RSASignature').set(str(signature),token=user['idToken'])
 
                         return True

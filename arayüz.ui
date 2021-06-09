@@ -166,19 +166,32 @@
     <property name="title">
      <string>Menü</string>
     </property>
-    <addaction name="actionMinimize_edilebilir"/>
+    <addaction name="Minimize_edilebilir"/>
+    <addaction name="Hakkimda"/>
     <addaction name="separator"/>
-    <addaction name="action_k"/>
+    <addaction name="Exit"/>
+   </widget>
+   <widget class="QMenu" name="menuTema">
+    <property name="title">
+     <string>Tema</string>
+    </property>
+    <addaction name="actionWindows"/>
+    <addaction name="actionVista"/>
+    <addaction name="actionF_zyon"/>
+    <addaction name="separator"/>
+    <addaction name="actionA_k"/>
+    <addaction name="actionKoyu"/>
    </widget>
    <addaction name="menu_k"/>
+   <addaction name="menuTema"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_k">
+  <action name="Exit">
    <property name="text">
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionMinimize_edilebilir">
+  <action name="Minimize_edilebilir">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -187,6 +200,36 @@
    </property>
    <property name="text">
     <string>Minimize edilebilir</string>
+   </property>
+  </action>
+  <action name="Hakkimda">
+   <property name="text">
+    <string>Hakkımda</string>
+   </property>
+  </action>
+  <action name="actionWindows">
+   <property name="text">
+    <string>Windows</string>
+   </property>
+  </action>
+  <action name="actionVista">
+   <property name="text">
+    <string>Vista</string>
+   </property>
+  </action>
+  <action name="actionF_zyon">
+   <property name="text">
+    <string>Füzyon</string>
+   </property>
+  </action>
+  <action name="actionA_k">
+   <property name="text">
+    <string>Açık</string>
+   </property>
+  </action>
+  <action name="actionKoyu">
+   <property name="text">
+    <string>Koyu</string>
    </property>
   </action>
  </widget>

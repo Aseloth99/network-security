@@ -1,27 +1,27 @@
 from Crypto.Random import get_random_bytes
-from Crypto.Cipher import AES
+from Crypto.Cipher.AES import new,MODE_GCM
 from Crypto.Protocol.KDF import scrypt
 import binascii
 import os
 
 class AESFile():
-    def fileEnc(AESTargetKey,filename):
-        BUFFER_SIZE = 1024 * 1024  # The size in bytes that we read, encrypt and write to at once
+    def fileEnc(self,yol):
+        BUFFER_SIZE = 2**20  # The size in bytes that we read, encrypt and write to at once
 
-        password = binascii.hexlify(AESTargetKey) 
+        password = "password"  # Get this from somewhere else like input()
 
-        input_filename = filename  # Any file extension will work bcz bytes
-        output_filename = input_filename + '.encrypted'  # You can name this anything, I'm just putting .encrypted on the end
+        input_filename = yol  # Any file extension will work
+        output_filename = yol + '.enc'  
 
         # Open files
         file_in = open(input_filename, 'rb')  # rb = read bytes. Required to read non-text files
         file_out = open(output_filename, 'wb')  # wb = write bytes. Required to write the encrypted data
 
         salt = get_random_bytes(32)  # Generate salt
-        key = scrypt(password, salt, key_len=32, N=2**17, r=8, p=1) 
+        key = scrypt(password, salt, key_len=32, N=2**17, r=8, p=1)  # Generate a key using the password and salt
         file_out.write(salt)  # Write the salt to the top of the output file
 
-        cipher = AES.new(key, AES.MODE_GCM)  # Create a cipher object to encrypt data
+        cipher = new(key, MODE_GCM)  # Create a cipher object to encrypt data
         file_out.write(cipher.nonce)  # Write out the nonce to the output file under the salt
 
         # Read, encrypt and write the data
@@ -38,15 +38,14 @@ class AESFile():
         # Close both files
         file_in.close()
         file_out.close()
-        return output_filename
 
-    def fileDec():
-        BUFFER_SIZE = 1024 * 1024  # The size in bytes that we read, encrypt and write to at once
+    def fileDec(self,yol):
+        BUFFER_SIZE = 2**20  # The size in bytes that we read, encrypt and write to at once
 
-        password = "pnK24cUw9rTPeCuRIRwP/rHxwZRd/D8vO2MP2BAf9i8="  # Get this from somewhere else like input()
+        password = "password"  # Get this from somewhere else like input()
 
-        input_filename = 'kufurYok.txt.encrypted'  # The encrypted file
-        output_filename = 'kufurYokDec.txt'  # The decrypted file
+        input_filename = yol+'.enc'  # The encrypted file
+        output_filename = yol+'1'  # The decrypted file
 
         # Open files
         file_in = open(input_filename, 'rb')
@@ -54,11 +53,11 @@ class AESFile():
 
         # Read salt and generate key
         salt = file_in.read(32)  # The salt we generated was 32 bits long
-        key = scrypt(password, salt, key_len=32, N=2**17, r=8, p=1)   # Generate a key using the password and salt again
+        key = scrypt(password, salt, key_len=32, N=2**17, r=8, p=1)  # Generate a key using the password and salt again
 
         # Read nonce and create cipher
         nonce = file_in.read(16)  # The nonce is 16 bytes long
-        cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+        cipher = new(key, MODE_GCM, nonce=nonce)
 
         # Identify how many bytes of encrypted there is
         # We know that the salt (32) + the nonce (16) + the data (?) + the tag (16) is in the file
@@ -89,3 +88,10 @@ class AESFile():
         # If everything was ok, close the files
         file_in.close()
         file_out.close()
+
+if __name__=="__main__":
+    AES="pnK24cUw9rTPeCuRIRwP/rHxwZRd/D8vO2MP2BAf9i8="
+    yol="C:/Users/Windows/Desktop/Cryptografy Mail/readme.txt"
+    dosya=AESFile()
+    dosya.fileEnc(yol)
+    dosya.fileDec(yol)

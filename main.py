@@ -41,7 +41,7 @@ class Ui_Main(object):
         self.retranslateUi(RegisterorLogin)
         QtCore.QMetaObject.connectSlotsByName(RegisterorLogin)
 
-        self.btnLogIn.clicked.connect(lambda:self.openLogin(RegisterorLogin,numberSFBURun))
+        self.btnLogIn.clicked.connect(lambda:self.openLogin(RegisterorLogin))
         self.btnRegister.clicked.connect(lambda:self.openRegister(RegisterorLogin))
 
     def retranslateUi(self, RegisterorLogin):
@@ -51,12 +51,12 @@ class Ui_Main(object):
         self.btnLogIn.setText(_translate("RegisterorLogin", "Login"))
         self.btnRegister.setText(_translate("RegisterorLogin", "Register"))
 
-    def openLogin(self, _RegisterorLogin,numberSFBURun):
+    def openLogin(self, _RegisterorLogin):
         _RegisterorLogin.close()
 
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Login()
-        self.ui.setupUi(self.window,numberSFBURun)
+        self.ui.setupUi(self.window)
         self.window.show()
 
     def openRegister(self, _RegisterorLogin):
