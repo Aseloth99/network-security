@@ -8,6 +8,7 @@ import Signature
 from base64 import b64encode,b64decode
 import Cryptology
 import time
+import os
 
 class Ui_Register(object):
     def setupUi(self, Register):
@@ -124,7 +125,11 @@ class Ui_Register(object):
                         # #cursor.execute(f"Insert into Key Values({str(rsaGenerator.privateKey)},{str(rsaGenerator.privateP)},{str(rsaGenerator.privateQ)},{str(rsaGenerator.publicKey[0])},{str(rsaGenerator.publicKey[1])})")
                         # con.commit()
 
-                        fileInfos = open("Keys.txt", "w+", encoding="UTF-16")
+                        try:
+                            fileInfos = open("Keys/"+gmail+"/Keys.txt", "w+", encoding="UTF-16")
+                        except:
+                            os.makedirs("Keys/"+gmail+"/") #iç içe klasör oluşturma
+                            fileInfos = open("Keys/"+gmail+"/Keys.txt", "w+", encoding="UTF-16")
                         
                         TimeStamp=time.time()
 
@@ -140,7 +145,7 @@ class Ui_Register(object):
                         fileInfos.write(EncPrivateQ+"\n")
                         fileInfos.write(EncN+"\n")
                         fileInfos.write(EncPublicKey+"\n")
-                        fileInfos.write(EncTimeStamp)
+                        fileInfos.write(EncTimeStamp+"\n")
                         fileInfos.close()
 
                         PublicRSAInfos={"PublicKey":str(rsaGenerator.publicKey[0]),"n":str(rsaGenerator.publicKey[1]),"Timestamp":TimeStamp}

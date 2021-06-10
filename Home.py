@@ -53,6 +53,9 @@ class MyLocalRings:
         self.publicKey = Cryptology.Decrypt(EncPublicKey, cryptoKey)
         self.timeStamp = Cryptology.Decrypt(EncTimeStamp, cryptoKey)
 
+        #AES'İ KARŞI RSA İLE ŞİFRELİCEM
+        #AES'İ KENDİ RSA İLE ŞİFRELİCEM
+
 class HomeStarter(QtWidgets.QMainWindow):
     def __init__(self, ui, window, myEmail, cryptoKey):
         super(HomeStarter, self).__init__()
@@ -65,8 +68,7 @@ class HomeStarter(QtWidgets.QMainWindow):
         self.ui.menubar.triggered.connect(self.menuResponse)
         self.GetUserName()
         self.ui.sendButton.clicked.connect(lambda: self.SendMail())
-        self.ui.pushButton.clicked.connect(
-            lambda: self.__openFileNamesDialog())
+        self.ui.pushButton.clicked.connect(lambda: self.__openFileNamesDialog())
 
         self.targetN = ""
         self.myEmail = myEmail
@@ -127,21 +129,27 @@ class HomeStarter(QtWidgets.QMainWindow):
         if validate_email(self.ui.toLineEdit.text()):
             try:
                 self.GetTargetPublicKey()
+                self.GetMyPublicKey()
             except:
                 pass
-            try:
-                if self.CheckAES():
-                    pass
-                else:
-                    self.CreateAndSetDBAES()
-            except:
-                self.CreateAndSetDBAES()
+            self.CreateAES()
 
-            self.targetAESKey = b64decode(self.targetAESKey)
+            self.AESKey = b64decode(self.AESKey)
 
             self.AESEncryption()
 
-            self.ControlReplayAttack()
+            self.RSAEncryptionAes()
+
+            #self.ControlReplayAttack() #Burada Daha önce Çekmiş olduğumuz Outboxlar arasında targetEmaili eşleşenlerin Timestampinden Replay Atağı Tespit Edeceğiz
+            
+            self.GoSendMail()
+
+    def RSAEncryptionAes(self):
+        EncRSAAes4Target = RSA.RS.encryptMsg(self.AESKey, int(self.targetN), int(self.targetPublicKey))
+        self.EncRSAAes4Target = b64encode(EncRSAAes4Target).decode('utf-8')
+
+        EncRSAAes4From = RSA.RS.encryptMsg(self.AESKey, int(self.actualMyN), int(self.actualMyPublicKey))
+        self.EncRSAAes4From = b64encode(EncRSAAes4From).decode('utf-8')
 
     def ControlReplayAttack(self):  # Replay Attack Engelleniyor
 
@@ -189,16 +197,22 @@ class HomeStarter(QtWidgets.QMainWindow):
                         self.targetN=targetRing.val()["n"]
 
                 # Şu anda en güncel timestamp'in ringsi var
-                    
                 self.targetEmail = self.ui.toLineEdit.text()
-
                 break
 
-    def CreateAndSetDBAES(self):  # Aes Oluşturuluyor ve DB'ye kaydediliyor.
+    def GetMyPublicKey(self): 
+        controlTS=0
+
+        for key in self.keys:
+            if (float(key.timeStamp) > controlTS):
+                controlTS=key.timeStamp
+                self.actualMyPublicKey=key.publicKey
+                self.actualMyN=key.n
+                
+
+    def CreateAES(self):  # Aes Oluşturuluyor ve DB'ye kaydediliyor.
         original = os.urandom(32)
-        self.targetAESKey = b64encode(original).decode('utf-8')
-        FBConf.db.child("AES").child(self.user['localId']).child(
-            self.targetDBKey).set(self.targetAESKey, token=self.user['idToken'])
+        self.AESKey = b64encode(original).decode('utf-8')
 
     def __openFileNamesDialog(self):  # Dosya Seçtiriliyor
         dlg = QFileDialog()
@@ -212,42 +226,51 @@ class HomeStarter(QtWidgets.QMainWindow):
             self.ui.lineEdit.setText(tmp)
             self.filename = self.InputFiles[0]
 
-    def CheckAES(self):  # Daha önce oluşturlmuş Aesin varlığı kontrol ediliyor
-        try:
-            self.targetAESKey = FBConf.db.child("AES").child(self.user['localId']).child(
-                self.targetDBKey).get(token=self.user['idToken']).val()
-
-            if self.targetAESKey == None:
-                return False
-            else:
-                return True
-        except:
-            return False
-
     def AESEncryption(self):  # Metinler Aes anahtarla şifreleniyor
         subject = self.ui.subjectLineEdit.text()
         body = self.ui.messageTextEdit.toPlainText()
+        self.ts= time.time()
 
         #(ciphertext, nonce, authTag)
         self.encSubjectAES = AES.AESCipher.encrypt_AES_GCM(
-            self, subject, self.targetAESKey)
+            self, subject, self.AESKey)
         self.encBodyAES = AES.AESCipher.encrypt_AES_GCM(
-            self, body, self.targetAESKey)
+            self, body, self.AESKey)
+        self.encTs=AES.AESCipher.encrypt_AES_GCM(
+            self,str(self.ts),self.AESKey)
+
+        self.encTargetEmail=AES.AESCipher.encrypt_AES_GCM(
+            self,self.targetEmail,self.AESKey)
+
+        self.encFromEmail=AES.AESCipher.encrypt_AES_GCM(
+            self,self.myEmail,self.AESKey)
 
         self.encSubjectAESstr = ""
         self.encBodyAESstr = ""
+        self.encTsStr=""
+        self.encTargetEmailStr=""
+        self.encFromEmailStr=""
 
-        for i in self.encSubjectAES:
-            # liste.append(b64encode(i).decode('utf-8'))
-            self.encSubjectAESstr += b64encode(i).decode('utf-8')+"₺"
+        for j in self.encSubjectAES:
+            self.encSubjectAESstr += b64encode(j).decode('utf-8')
 
         for j in self.encBodyAES:
-            self.encBodyAESstr += b64encode(j).decode('utf-8')+"₺"
+            self.encBodyAESstr += b64encode(j).decode('utf-8')
+
+        for j in self.encTs:
+            self.encTsStr += b64encode(j).decode('utf-8')
+
+        for j in self.encTargetEmail:
+            self.encTargetEmailStr += b64encode(j).decode('utf-8')
+
+        for j in self.encFromEmail:
+            self.encFromEmailStr += b64encode(j).decode('utf-8')
+            
 
     def SaveMailToDB(self):  # Mailler gerekli yerlere kaydediliyor (Inbox ve Outbox)
         ts = time.time()
 
-        EncRSAaes = RSA.RS.encryptMsg(self.targetAESKey, int(
+        EncRSAaes = RSA.RS.encryptMsg(self.AESKey, int(
             self.targetN), int(self.targetPublicKey))
         EncRSAaes = b64encode(EncRSAaes).decode('utf-8')
 
@@ -284,9 +307,8 @@ class HomeStarter(QtWidgets.QMainWindow):
 
         msg = MIMEMultipart()
         msg["From"] = self.myEmail
-        #msg["To"] = self.targetEmail
-        msg["To"] = "mustafaacik92@gmail.com"
-        msg["Subject"] = str(self.encSubjectAES)
+        msg["To"] = self.targetEmail
+        msg["Subject"] = str(self.encSubjectAESstr)
 
         # SMTP objemizi oluşturuyoruz ve gmail smtp server'ına bağlanıyoruz.
         mail = smtplib.SMTP("smtp.gmail.com", 587)
@@ -295,9 +317,10 @@ class HomeStarter(QtWidgets.QMainWindow):
         try:
             mail.login(self.myEmail, myPassword)
         except:
-            self.ui.nameLabel.setText(
-                "Your account is not real gmail or password")
-        body = str(self.encBodyAES)
+            self.ui.nameLabel.setText("Your account is not real gmail or password")
+
+        body = str(self.EncRSAAes4From+"₺"+self.EncRSAAes4Target+"₺"+self.encBodyAESstr+"₺"
+        +self.encFromEmailStr+"₺"+encTargetEmailStr+"₺"+self.encTsStr+"₺"+str(self.ts))
 
         # Mailimizin gövdesini bu sınıftan oluşturuyoruz.
         msg_govdesi = MIMEText(body, "plain")
@@ -308,7 +331,7 @@ class HomeStarter(QtWidgets.QMainWindow):
             pass
         else:
             filename = AesFileEnc.AESFile.fileEnc(
-                self.targetAESKey, self.filename)
+                self.AESKey, self.filename)
 
             self.PutFiletoDB(filename)
 

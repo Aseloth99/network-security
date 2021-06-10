@@ -15,13 +15,11 @@ def KeyMaker():
         length=32,
         salt=salt,
         iterations=100000,
-        backend=backend
-    )
+        backend=backend)
     return base64.urlsafe_b64encode(kdf.derive(bytes(randomword(20),"utf-8"))).decode("ascii")
 
 def Encrypt(text,key):
     return Fernet(key).encrypt(text.encode("UTF-16")).decode("UTF-16")
-
 
 def Decrypt(data,key):
     return  Fernet(key).decrypt(data.encode("UTF-16")).decode("UTF-16")
@@ -33,5 +31,6 @@ def randomword(length):
 if __name__=="__main__":
     key=KeyMaker()
     enc=Encrypt("selam",key)
+    print(enc) #䅧䅁䅁杂汷䔹䉱奎猴塬到牚䱥氷橐䭇䵄䩏㜳湺睬奅彆㙖礳ⵢ歊㕈䕗牶牊児䩉䔭党卵䝔塣摍卤焲奣䍁偌楴䉍海䥉朷㴽
     dec=Decrypt(enc,key)
     print(dec)

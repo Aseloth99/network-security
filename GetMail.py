@@ -1,41 +1,102 @@
 import imaplib
 import email
+import datetime
+from email.header import decode_header
+import os
 
-username = 'klavyefl@gmail.com'
-password = 'KlavyeFL0.'
+# Inbox için  INBOX/{MYAPPMAİL}/{FROMEMAİL}/{MAİLTİMESAMP}/{FİLE}
+# Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
 
-def get_inbox():
-    mail = imaplib.IMAP4_SSL('imap.gmail.com')
-    mail.login(username, password)
-    mail.select("INBOX")
-    _, search_data = mail.search(None,"ALL")
-    my_message = []
-    for num in search_data[0].split():
-        email_data = {}
-        _, data = mail.fetch(num, '(RFC822)')
-        #print(data[0])
-        _, b = data[0]
-        email_message = email.message_from_bytes(b)
-        for part in email_message.walk():
-            if part.get_content_type() == "text/plain":
-                body = part.get_payload(decode=True)
-        for header in ['subject', 'to', 'from', 'date']:
-            #print("{}: {}".format(header, email_message[header]))
-            if(header=='from'):
-                email_data['from'] = email_message['from'].split("<")[1].strip(">")
-            else:
-                email_data[header] = email_message[header]
-        email_data['body'] = body.decode()
-        my_message.append(email_data)
-    return my_message
+class GetMails:
+    def getInbox(self,username,password):
+        mail = imaplib.IMAP4_SSL('imap.gmail.com')
+        mail.login(username, password)
+        mail.select('INBOX')
+        _, search_data = mail.search(None,"ALL")
+        my_message = []
+        for num in search_data[0].split():
+            email_data = {}
+            _, data = mail.fetch(num, '(RFC822)')
+            # print(data[0])
+            _, b = data[0]
+            email_message = email.message_from_bytes(b)
+            for part in email_message.walk():
+                if part.get_content_type() == "text/plain":
+                    body = part.get_payload(decode=True)
+            for header in ['subject', 'to', 'from', 'date']:
+                # print("{}: {}".format(header, email_message[header]))
+                if(header=='from'):
+                    email_data['from'] = email_message['from'].split("<")[1].strip(">")
+                else:
+                    email_data[header] = email_message[header]
+            email_data['body'] = body.decode()
+            my_message.append(email_data)
+        return my_message
+
+    def getOutbox(self,username,password,appGmail,toEmail,timeStamp):
+        mail = imaplib.IMAP4_SSL('imap.gmail.com',993)
+        mail.login(username, password)
+        # print(mail.list())
+        # print("{0} Connecting to mailbox via IMAP...".format(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")))
+        mail.select('"[Gmail]/G&APY-nderilmi&AV8- Postalar"')  #for english [Gmail]/Sent Mail
+        status, search_data = mail.search(None,'ALL')
+        my_message = []
+        for num in search_data[0].split():
+            email_data = {}
+            _, data = mail.fetch(num, '(RFC822)')
+            # print(data[0])
+            _, b = data[0]
+            email_message = email.message_from_bytes(b)
+            subject, encoding = decode_header(email_message["Subject"])[0]
+            if isinstance(subject, bytes):
+                # if it's a bytes, decode to str
+                subject = subject.decode(encoding) #subject elde etme
+            if email_message.is_multipart():
+                # iterate over email parts
+                for part in email_message.walk():
+                    # extract content type of email
+                    content_type = part.get_content_type()
+                    content_disposition = str(part.get("Content-Disposition"))
+                    if content_type == "text/plain" and "attachment" not in content_disposition:
+                        body = part.get_payload(decode=True).decode()
+                    elif "attachment" in content_disposition:
+                            # download attachment
+                            filename = part.get_filename()
+                            path = "OUTBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
+                            if filename:
+                                if not os.path.isdir(path):
+                                # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
+                                    os.makedirs(path)
+                                filepath = os.path.join(path, filename)
+                                # download attachment and save it
+                                open(filepath, "wb").write(part.get_payload(decode=True))
+                for header in ['from', 'to', 'date', 'subject']:
+                    #print("{}: {}".format(header, email_message[header]))
+                    if(header=='from'):
+                        email_data['from'] = email_message['from'].split("<")[1].strip(">")
+                    elif(header=='subject'):
+                        email_data['subject'] = subject
+                    else:
+                        email_data[header] = email_message[header]
+                email_data['body'] = body
+                my_message.append(email_data)
+        return my_message
 
 if __name__ == "__main__":
-    my_inbox = get_inbox()
-    print(my_inbox)
-    for i in my_inbox:
+    box = GetMails()
+    # my_inbox = box.getInbox("klavyefl@gmail.com","KlavyeFL0.")
+    # print(my_inbox)
+    # for i in my_inbox:
+    #     print()
+    #     for j in i.items():
+    #         print(f"{j[0]:<9}{j[1]}")
+
+    my_outbox = box.getOutbox("klavyefl@gmail.com","KlavyeFL0.","klavyefl@gmail.com","mustafaacik92@gmail.com",str(11231241.1231251))
+    # print(my_outbox)
+    for i in my_outbox:
         print()
         for j in i.items():
-            print(f"{j[0]:<8}{j[1]}")
+            print(f"{j[0]:<9}{j[1]}")
     
 """import imaplib
 import email
@@ -154,7 +215,7 @@ def read_email_from_gmail():
         data = mail.search(None, 'ALL')
         mail_ids = data[1]
         print(mail_ids)
-        id_list = mail_ids[0].split()   
+        id_list = mail_ids[0].split()
         first_email_id = int(id_list[0])
         latest_email_id = int(id_list[-1])
         print(first_email_id,latest_email_id)
