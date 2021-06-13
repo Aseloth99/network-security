@@ -44,8 +44,8 @@ class AESFile():
 
         password = "password"  # Get this from somewhere else like input()
 
-        input_filename = yol+'.enc'  # The encrypted file
-        output_filename = yol+'1'  # The decrypted file
+        input_filename = yol  # The encrypted file
+        output_filename = yol[:-4:]  # The decrypted file
 
         # Open files
         file_in = open(input_filename, 'rb')
@@ -90,7 +90,7 @@ class AESFile():
         file_out.close()
 
 if __name__=="__main__":
-    AES="pnK24cUw9rTPeCuRIRwP/rHxwZRd/D8vO2MP2BAf9i8="
+    #AES="pnK24cUw9rTPeCuRIRwP/rHxwZRd/D8vO2MP2BAf9i8="
     yol="C:/Users/Windows/Desktop/Cryptografy Mail/readme.txt"
     dosya=AESFile()
     dosya.fileEnc(yol)

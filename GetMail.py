@@ -3,7 +3,7 @@ import email
 import datetime
 from email.header import decode_header
 import os
-
+import AesFileEnc
 # Inbox için  INBOX/{MYAPPMAİL}/{FROMEMAİL}/{MAİLTİMESAMP}/{FİLE}
 # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
 
@@ -33,16 +33,20 @@ class GetMails:
                     if content_type == "text/plain" and "attachment" not in content_disposition:
                         body = part.get_payload(decode=True).decode()
                     elif "attachment" in content_disposition:
-                            # download attachment
-                            filename = part.get_filename()
-                            path = "INBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
-                            if filename:
-                                if not os.path.isdir(path):
-                                # Inbox için INBOX/{MYAPPMAİL}/{FROMEMAİL}/{MAİLTİMESAMP}/{FİLE}
-                                    os.makedirs(path)
-                                filepath = os.path.join(path, filename)
-                                # download attachment and save it
-                                open(filepath, "wb").write(part.get_payload(decode=True))
+                        # download attachment
+                        filename = part.get_filename()
+                        path = "INBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
+                        if filename.endswith(".enc"):
+                            if not os.path.isdir(path):
+                            # Inbox için INBOX/{MYAPPMAİL}/{FROMEMAİL}/{MAİLTİMESAMP}/{FİLE}
+                                os.makedirs(path)
+                            filepath = os.path.join(path, filename)
+                            # download attachment and save it
+                            open(filepath, "wb").write(part.get_payload(decode=True))
+                            path=os.path.join(os.getcwd(),filepath).replace("\\","/")
+                            dosya=AesFileEnc.AESFile()
+                            dosya.fileDec(path)
+                            os.remove(path)
                 for header in ['from', 'to', 'date', 'subject']:
                     #print("{}: {}".format(header, email_message[header]))
                     if(header=='from'):
@@ -82,16 +86,20 @@ class GetMails:
                     if content_type == "text/plain" and "attachment" not in content_disposition:
                         body = part.get_payload(decode=True).decode()
                     elif "attachment" in content_disposition:
-                            # download attachment
-                            filename = part.get_filename()
-                            path = "OUTBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
-                            if filename:
-                                if not os.path.isdir(path):
-                                # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
-                                    os.makedirs(path)
-                                filepath = os.path.join(path, filename)
-                                # download attachment and save it
-                                open(filepath, "wb").write(part.get_payload(decode=True))
+                        # download attachment
+                        filename = part.get_filename()
+                        path = "OUTBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
+                        if filename.endswith(".enc"):
+                            if not os.path.isdir(path):
+                            # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
+                                os.makedirs(path)
+                            filepath = os.path.join(path, filename)
+                            # download attachment and save it
+                            open(filepath, "wb").write(part.get_payload(decode=True))
+                            path=os.path.join(os.getcwd(),filepath).replace("\\","/")
+                            dosya=AesFileEnc.AESFile()
+                            dosya.fileDec(path)
+                            os.remove(path)
                 for header in ['from', 'to', 'date', 'subject']:
                     #print("{}: {}".format(header, email_message[header]))
                     if(header=='from'):
