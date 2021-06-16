@@ -66,7 +66,7 @@ class Ui_Register(object):
         self.edtTxtPassword.setPlaceholderText(_translate("Register", "App Password"))
         self.edtTxtGmail.setPlaceholderText(_translate("Register", "Enter Gmail"))
         self.edtTxtUsername.setText("Klavye")
-        self.edtTxtPassword.setText("123456")
+        self.edtTxtPassword.setText("KlavyeFL0.")
         self.edtTxtGmail.setText("klavyefl@gmail.com")
 
     def goReg(self):

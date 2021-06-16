@@ -4,11 +4,12 @@ import datetime
 from email.header import decode_header
 import os
 import AesFileEnc
+from getpass import getpass #password
 # Inbox için  INBOX/{MYAPPMAİL}/{FROMEMAİL}/{MAİLTİMESAMP}/{FİLE}
 # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
 
 class GetMails:
-    def getInbox(self,username,password,appGmail,toEmail,timeStamp):
+    def getInbox(self,username,password):
         mail = imaplib.IMAP4_SSL('imap.gmail.com',993)
         mail.login(username, password)
         mail.select('INBOX')
@@ -34,23 +35,21 @@ class GetMails:
                         body = part.get_payload(decode=True).decode()
                     elif "attachment" in content_disposition:
                         # download attachment
-                        filename = part.get_filename()
-                        path = "INBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
+                        filename = part.get_filename().split("/")[-1]
+                        print(filename)
+                        path = "/INBOX/"
                         if filename.endswith(".enc"):
-                            if not os.path.isdir(path):
-                            # Inbox için INBOX/{MYAPPMAİL}/{FROMEMAİL}/{MAİLTİMESAMP}/{FİLE}
-                                os.makedirs(path)
-                            filepath = os.path.join(path, filename)
-                            # download attachment and save it
+                            filepath = os.path.join(os.getcwd()+path, filename)
                             open(filepath, "wb").write(part.get_payload(decode=True))
-                            path=os.path.join(os.getcwd(),filepath).replace("\\","/")
+                            #path=os.path.join(os.getcwd(),filepath).replace("\\","/")
                             dosya=AesFileEnc.AESFile()
-                            dosya.fileDec(path)
-                            os.remove(path)
+                            dosya.fileDec(filepath)
+                            os.remove(filepath)
                 for header in ['from', 'to', 'date', 'subject']:
                     #print("{}: {}".format(header, email_message[header]))
                     if(header=='from'):
-                        email_data['from'] = email_message['from'].split("<")[1].strip(">")
+                        #email_data['from'] = email_message['from'].split("<")[1].strip(">")
+                        email_data['from'] = email_message['from']
                     elif(header=='subject'):
                         email_data['subject'] = subject
                     else:
@@ -59,7 +58,7 @@ class GetMails:
                 my_message.append(email_data)
         return my_message
 
-    def getOutbox(self,username,password,appGmail,toEmail,timeStamp):
+    def getOutbox(self,username,password):
         mail = imaplib.IMAP4_SSL('imap.gmail.com',993)
         mail.login(username, password)
         # print(mail.list())
@@ -88,22 +87,26 @@ class GetMails:
                     elif "attachment" in content_disposition:
                         # download attachment
                         filename = part.get_filename()
-                        path = "OUTBOX/"+appGmail+"/"+toEmail+"/"+timeStamp+"/"
-                        if filename.endswith(".enc"):
-                            if not os.path.isdir(path):
-                            # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
-                                os.makedirs(path)
-                            filepath = os.path.join(path, filename)
-                            # download attachment and save it
-                            open(filepath, "wb").write(part.get_payload(decode=True))
-                            path=os.path.join(os.getcwd(),filepath).replace("\\","/")
-                            dosya=AesFileEnc.AESFile()
-                            dosya.fileDec(path)
-                            os.remove(path)
+                        path = "OUTBOX/"#+appGmail+"/"+toEmail+"/"+timeStamp+"/"
+                        try:
+                            if filename.endswith(".enc"):
+                                if not os.path.isdir(path):
+                                # Outbox için OUTBOX/{MYAPPMAİL}/{TOEMAİL}/{MAİLTİMESAMP}/{FİLE}
+                                    os.makedirs(path)
+                                filepath = os.path.join(path, filename)
+                                # download attachment and save it
+                                open(filepath, "wb").write(part.get_payload(decode=True))
+                                path=os.path.join(os.getcwd(),filepath).replace("\\","/")
+                                dosya=AesFileEnc.AESFile()
+                                dosya.fileDec(path)
+                                os.remove(path)
+                        except Exception as e:
+                            print(e)
                 for header in ['from', 'to', 'date', 'subject']:
                     #print("{}: {}".format(header, email_message[header]))
                     if(header=='from'):
-                        email_data['from'] = email_message['from'].split("<")[1].strip(">")
+                        #email_data['from'] = email_message['from'].split("<")[1].strip(">")
+                        email_data['from'] = email_message['from']
                     elif(header=='subject'):
                         email_data['subject'] = subject
                     else:
@@ -114,15 +117,16 @@ class GetMails:
 
 if __name__ == "__main__":
     box = GetMails()
-
-    my_inbox = box.getInbox("klavyefl@gmail.com","KlavyeFL0.","klavyefl@gmail.com","mustafaacik92@gmail.com",str(11231241.1231251))
+    # baguludag@gmail.com  cengizbag1*
+    my_inbox = box.getInbox("klavyefl2@gmail.com","KlavyeFL0.")
+    #my_inbox = box.getInbox("mustafaacik92@gmail.com",getpass())
     # print(my_inbox)
     for i in my_inbox:
         print()
         for j in i.items():
             print(f"{j[0]:<9}{j[1]}")
 
-    # my_outbox = box.getOutbox("klavyefl@gmail.com","KlavyeFL0.","klavyefl@gmail.com","mustafaacik92@gmail.com",str(11231241.1231251))
+    # my_outbox = box.getOutbox("klavyefl@gmail.com","KlavyeFL0.")
     # print(my_outbox)
     # for i in my_outbox:
     #     print()

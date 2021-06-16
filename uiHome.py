@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Home(object):
     def setupUi(self, Home):
         Home.setObjectName("Home")
-        Home.resize(698, 615)
+        Home.resize(802, 440)
         self.centralwidget = QtWidgets.QWidget(Home)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
@@ -94,7 +94,7 @@ class Ui_Home(object):
         self.gridLayout_2.addWidget(self.tabWidget, 1, 0, 1, 1)
         Home.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Home)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 698, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 802, 21))
         self.menubar.setObjectName("menubar")
         self.menu_k = QtWidgets.QMenu(self.menubar)
         self.menu_k.setObjectName("menu_k")
@@ -141,7 +141,7 @@ class Ui_Home(object):
 
     def retranslateUi(self, Home):
         _translate = QtCore.QCoreApplication.translate
-        Home.setWindowTitle(_translate("Home", "MainWindow"))
+        Home.setWindowTitle(_translate("Home", "Secure Mail Program"))
         self.nameLabel.setText(_translate("Home", "TextLabel"))
         self.fromLabel.setText(_translate("Home", "From: "))
         self.toLineEdit.setPlaceholderText(_translate("Home", "To"))

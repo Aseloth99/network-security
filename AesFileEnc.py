@@ -38,7 +38,7 @@ class AESFile():
         # Close both files
         file_in.close()
         file_out.close()
-
+        return output_filename
     def fileDec(self,yol):
         BUFFER_SIZE = 2**20  # The size in bytes that we read, encrypt and write to at once
 

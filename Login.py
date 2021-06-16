@@ -38,7 +38,7 @@ class Ui_Login(object):
         self.edtLineAppPassword.setMouseTracking(True)
         self.edtLineAppPassword.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.edtLineAppPassword.setInputMask("")
-        self.edtLineAppPassword.setText("123456")
+        self.edtLineAppPassword.setText("KlavyeFL0.")
         
         self.edtLineAppPassword.setAlignment(QtCore.Qt.AlignCenter)
         self.edtLineAppPassword.setReadOnly(False)
@@ -82,7 +82,7 @@ class Ui_Login(object):
         user = FBConf.auth.current_user
 
         cryptoKey=FBConf.db.child("User").child(user['localId']).child("CyrptologyKey").get().val()
-        print("Login cryptoKeyi ",cryptoKey)
+        #print("Login cryptoKeyi ",cryptoKey)
 
         _Login.close()
         
@@ -90,7 +90,7 @@ class Ui_Login(object):
         self.ui = Home.Ui_Home()
         self.ui.setupUi(self.window)
         self.window.show()
-        Home.HomeStarter(self.ui,self.window,self.edtLineMail.text(),cryptoKey)
+        Home.HomeStarter(self.ui,self.window,self.edtLineMail.text(),cryptoKey,self.edtLineAppPassword.text())
             
         # except Exception as e:
         #     print(e)
